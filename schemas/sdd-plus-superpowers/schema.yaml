@@ -214,18 +214,48 @@ apply:
        **superpowers:using-git-worktrees** to create an isolated
        git worktree for this change.
 
-    2. **Executor**: Use the Skill tool to invoke
+    2. **TDD enforcement**: Use the Skill tool to invoke
+       **superpowers:test-driven-development**. This is MANDATORY
+       for every task — no exceptions.
+
+       Every micro-task in plan.md MUST follow the Red-Green-Refactor cycle:
+       - **RED**: Write a failing test FIRST that captures the requirement
+         from the corresponding spec scenario. Run the test. It MUST fail.
+         If it passes, the test is not testing anything new — rewrite it.
+       - **GREEN**: Write the MINIMUM code to make the test pass.
+         No extra logic, no premature abstractions. Run the test. It MUST pass.
+       - **REFACTOR**: Clean up code and tests while keeping all tests green.
+         Run the full test suite after refactoring.
+
+       HARD RULES:
+       - Do NOT write implementation code before a failing test exists.
+       - Do NOT skip the RED phase — a test that never failed proves nothing.
+       - Do NOT move to the next task until all tests for the current task pass.
+       - If a task cannot be tested (infrastructure, config), document
+         the reason in a comment and get explicit user approval before proceeding.
+
+    3. **Executor**: Use the Skill tool to invoke
        **superpowers:subagent-driven-development** to execute
        the plan.md micro-tasks with fresh subagents per task.
 
        Tell the executor:
        - Read plan.md in this change directory for micro-tasks
+       - Follow the TDD cycle from step 2 for EVERY task
        - Update tasks.md checkboxes as coarse tasks complete
        - Work within the created worktree
+       - Each subagent MUST run the full test suite before marking
+         a task as complete
 
-    3. **Completion**: When all tasks are done, use the Skill tool
+    4. **Completion**: When all tasks are done, use the Skill tool
        to invoke **superpowers:finishing-a-development-branch**
        for branch cleanup, PR creation, etc.
 
+       Before finishing, verify:
+       - All tests pass (full suite, not just new tests)
+       - No skipped or pending tests remain without documented justification
+       - Test coverage for new code meets project standards
+
     If any skill is unavailable, fall back to manual implementation
-    using the standard task-by-task loop from tasks.md.
+    using the standard task-by-task loop from tasks.md,
+    but the TDD cycle (Red-Green-Refactor) is STILL MANDATORY
+    even in fallback mode.
