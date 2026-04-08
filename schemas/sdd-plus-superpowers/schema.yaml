@@ -2,16 +2,58 @@ name: sdd-plus-superpowers
 version: 1
 description: >
   Spec-driven workflow integrated with Superpowers skills.
-  brainstorm → proposal → design/specs → tasks → plan.
+  intent (optional) → brainstorm → proposal → design/specs → tasks → plan.
   Apply phase uses git worktrees + subagent-driven development.
 
 artifacts:
+  - id: intent
+    generates: intent.md
+    description: Normalized input from any source (PRD, brainstorm, ticket, conversation). Bridges the gap between raw ideas and structured planning.
+    template: intent.md
+    optional: true
+    instruction: |
+      Create or refine the intent document that captures the normalized
+      input for this change. The intent.md acts as a universal entry point
+      that accepts input from any source (PRD, external brainstorm,
+      ticket, conversation) and distills it into a standard format.
+
+      If the user provides a PRD or external document as source:
+      - Extract the core problem, desired outcome, and scope
+      - Preserve decisions already made (do NOT re-explore them)
+      - Discard implementation prescriptions — keep the "what" and "why",
+        drop the "how"
+      - Reference the source document in the Source section
+
+      If the user provides a raw idea or conversation notes:
+      - Capture what is known, flag what is not
+      - List open questions explicitly
+
+      CRITICAL decision logic for downstream flow:
+      - If "Open questions" is EMPTY → brainstorm can be skipped.
+        The proposal artifact should consume intent.md directly.
+      - If "Open questions" has items → brainstorm is required
+        to resolve them before proceeding to proposal.
+
+      Keep it concise (under 1 page). This is a filter, not a document.
+    requires: []
+
   - id: brainstorm
     generates: brainstorm.md
     description: Collaborative design exploration using Superpowers brainstorming
     template: brainstorm.md
     instruction: |
       Use the Skill tool to invoke **superpowers:brainstorming**.
+
+      **If intent.md exists in this change directory**, pass its content
+      as context to the brainstorming session. Specifically:
+      - Use "Problem" and "Desired outcome" to frame the discussion
+      - Use "Decisions already made" as constraints (do not re-explore)
+      - Use "Open questions" as the agenda — these are the items
+        that need resolution through brainstorming
+      - Reference "Source" for additional context if needed
+
+      **If intent.md does not exist**, proceed with standard
+      brainstorming from scratch.
 
       IMPORTANT output redirection:
       - Do NOT write to `docs/superpowers/specs/`. Instead, write the
@@ -35,17 +77,24 @@ artifacts:
     description: Initial proposal document outlining the change
     template: proposal.md
     instruction: |
-      Create the proposal document based on the brainstorming output.
+      Create the proposal document based on available upstream artifacts.
 
-      Read brainstorm.md for the validated design. Extract:
-      - **Why**: The motivation (from brainstorming discussion)
+      **Source resolution order:**
+      1. If brainstorm.md exists → use it as primary source (standard flow)
+      2. If only intent.md exists (brainstorm was skipped) → use intent.md
+         as primary source. Extract "Problem" as the Why, "Desired outcome"
+         and "Scope" as What Changes, and "Decisions already made" as
+         constraints for the design.
+
+      From the resolved source, extract:
+      - **Why**: The motivation
       - **What Changes**: Specific changes agreed upon
       - **Capabilities**: Identify which specs will be created or modified:
         - **New Capabilities**: List capabilities being introduced. Each becomes a new `specs/<name>/spec.md`. Use kebab-case names.
         - **Modified Capabilities**: List existing capabilities whose REQUIREMENTS are changing. Check `openspec/specs/` for existing spec names.
       - **Impact**: Affected code, APIs, dependencies, or systems.
 
-      Since brainstorming already explored the problem space,
+      Since upstream artifacts already explored the problem space,
       this should be a concise extraction, not a new exploration.
 
       IMPORTANT: The Capabilities section is critical. It creates the contract between
