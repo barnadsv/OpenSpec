@@ -1,31 +1,38 @@
-# sdd-plus-superpowers Schema
+# Schema sdd-plus-superpowers
 
-將 OpenSpec 的 artifact 治理流程與 Superpowers 的執行技能整合為單一工作流。
-
-## 這個 Schema 解決什麼問題
-
-OpenSpec 管理「做什麼」（proposal → specs → design → tasks），Superpowers 管理「怎麼做」（brainstorming、writing-plans、subagent-driven-development）。兩者各自優秀，但在實際開發中交替使用時出現三個結構性問題：
-
-1. **產出重複** — brainstorming 產出設計文件在 Superpowers 目錄（`docs/superpowers/specs/`），OpenSpec 又在 change 目錄重新撰寫 proposal/design，內容高度重疊。
-2. **Task 分裂** — OpenSpec 的 `tasks.md`（粗粒度 checkbox）和 Superpowers 的 plan（微型 TDD 步驟）描述同一件事，但格式、位置、狀態追蹤各自獨立。
-3. **手動編排** — 使用者必須自行判斷「現在該用哪個技能」，兩個系統之間沒有自動銜接。
-
-### 為什麼用自定義 Schema 而非修改現有技能
-
-曾考慮兩種替代方案：
-
-- **在 config.yaml 加自定義欄位**（如 `skill_bindings`）：OpenSpec CLI 不認識這些欄位，無驗證、無發現性，且需要修改多個 SKILL.md 才能讀取。
-- **直接修改 opsx 技能檔案**：侵入性高，影響所有 change，且 SKILL.md 升級時會被覆蓋。
-
-自定義 schema 利用 OpenSpec **原生支援的專案級 schema 機制**：
-- CLI 會驗證 schema 結構
-- `openspec schemas` 自動列出
-- 每個 change 可獨立選擇 schema（`--schema spec-driven` 或 `--schema sdd-plus-superpowers`）
-- 不動任何現有 SKILL.md 或 command 檔案
+Integra o fluxo de governança de artefatos do OpenSpec com as habilidades de execução do Superpowers em um único fluxo de trabalho.
 
 ---
 
-## 工作流概覽
+## O que este Schema resolve
+
+O OpenSpec gerencia **"o que fazer"** (proposal → specs → design → tasks), enquanto o Superpowers gerencia **"como fazer"** (brainstorming, writing-plans, subagent-driven-development). Ambos são excelentes individualmente, mas ao alternarem entre si no desenvolvimento real, surgem três problemas estruturais:
+
+- **Duplicação de produção** — o brainstorming gera documentos de design no diretório do Superpowers (`docs/superpowers/specs/`), enquanto o OpenSpec reescreve proposal/design no diretório change, com conteúdo muito semelhante.
+
+- **Fragmentação de Tasks** — o `tasks.md` do OpenSpec (checkboxes de granularidade grossa) e o `plan` do Superpowers (passos micro TDD) descrevem a mesma coisa, mas com formatos, localizações e rastreamento de estado independentes.
+
+- **Orquestração manual** — o usuário precisa decidir sozinho "qual habilidade usar agora", sem integração automática entre os dois sistemas.
+
+---
+
+## Por que usar um Schema personalizado em vez de modificar as habilidades existentes
+
+Duas alternativas foram consideradas:
+
+- **Adicionar campos personalizados no `config.yaml`** (como `skill_bindings`): o CLI do OpenSpec não reconhece esses campos, sem validação, sem descoberta, e seria necessário modificar vários `SKILL.md` para lê-los.
+- **Modificar diretamente os arquivos de habilidades do opsx**: invasivo, afeta todos os changes, e seria sobrescrito ao atualizar os `SKILL.md`.
+
+O schema personalizado utiliza o mecanismo de schema em nível de projeto suportado nativamente pelo OpenSpec:
+
+- O CLI valida a estrutura do schema
+- `openspec schemas` lista automaticamente
+- Cada change pode escolher seu schema de forma independente (`--schema spec-driven` ou `--schema sdd-plus-superpowers`)
+- Nenhum `SKILL.md` ou arquivo de comando existente é alterado
+
+---
+
+## Visão geral do fluxo de trabalho
 
 ```
 brainstorm ──→ proposal ──→ specs ──→ tasks ──→ plan
@@ -33,54 +40,58 @@ brainstorm ──→ proposal ──→ specs ──→ tasks ──→ plan
                   └──→ design ──────────┘
 ```
 
-與 `spec-driven` 的差異：
+**Diferenças em relação ao spec-driven:**
 
 | | spec-driven | sdd-plus-superpowers |
 |---|---|---|
-| 起點 | proposal（手動撰寫） | **brainstorm**（調用 brainstorming skill） |
-| 終點 | tasks（粗粒度） | **plan**（微型 TDD 步驟） |
-| apply 需要 | tasks | **plan** |
-| apply 方式 | 標準 task-by-task | **worktree + subagent-driven-development** |
-| 新增 artifacts | — | brainstorm, plan |
+| Ponto de entrada | proposal (escrito manualmente) | brainstorm (invoca a habilidade brainstorming) |
+| Ponto de saída | tasks (granularidade grossa) | plan (passos micro TDD) |
+| apply requer | tasks | plan |
+| Método de apply | task-by-task padrão | worktree + subagent-driven-development |
+| Novos artefatos | — | brainstorm, plan |
 
 ---
 
-## 整合的 Superpowers 技能
+## Habilidades Superpowers integradas
 
-| Schema 階段 | 調用的 Superpowers 技能 | 觸發方式 |
-|------------|------------------------|---------|
-| brainstorm artifact | `superpowers:brainstorming` | artifact instruction 指示 |
-| plan artifact | `superpowers:writing-plans` | artifact instruction 指示 |
-| apply phase | `superpowers:using-git-worktrees` | apply instruction 指示 |
-| apply phase | `superpowers:subagent-driven-development` | apply instruction 指示 |
-| apply 完成後 | `superpowers:finishing-a-development-branch` | apply instruction 指示 |
+| Fase do Schema | Habilidade Superpowers invocada | Como é acionada |
+|---|---|---|
+| artefato brainstorm | `superpowers:brainstorming` | instrução do artefato |
+| artefato plan | `superpowers:writing-plans` | instrução do artefato |
+| fase apply | `superpowers:using-git-worktrees` | instrução do apply |
+| fase apply | `superpowers:subagent-driven-development` | instrução do apply |
+| após apply | `superpowers:finishing-a-development-branch` | instrução do apply |
 
-所有整合都透過 schema.yaml 的 `instruction` 欄位實現 — 指示 AI 在適當時機用 Skill tool 調用對應技能。不修改任何 Superpowers 技能檔案本身。
-
-### Output Redirection（產出重導）
-
-Superpowers 技能有預設的輸出路徑（如 brainstorming 寫到 `docs/superpowers/specs/`）。在此 schema 中，artifact instruction 包含重導指示，告知被調用的技能將產出寫入 change 目錄：
-
-- brainstorming → `openspec/changes/<name>/brainstorm.md`（+ 可選 `design.md`）
-- writing-plans → `openspec/changes/<name>/plan.md`
-
-這透過上下文注入實現（在調用技能時附加指示），而非修改技能程式碼。
+Todas as integrações são realizadas pelo campo `instruction` do `schema.yaml` — instruindo a IA a invocar a habilidade correspondente no momento adequado. Nenhum arquivo de habilidade do Superpowers é modificado.
 
 ---
 
-## 使用方式
+## Redirecionamento de saída (Output Redirection)
 
-### 快速流程（推薦）
+As habilidades do Superpowers têm caminhos de saída padrão (ex.: brainstorming escreve em `docs/superpowers/specs/`). Neste schema, a instrução do artefato inclui diretrizes de redirecionamento, informando à habilidade invocada para gravar no diretório do change:
+
+- **brainstorming** → `openspec/changes/<name>/brainstorm.md` (+ `design.md` opcional)
+- **writing-plans** → `openspec/changes/<name>/plan.md`
+
+Isso é feito por injeção de contexto (anexando instruções ao invocar a habilidade), sem modificar o código das habilidades.
+
+---
+
+## Como usar
+
+### Fluxo rápido (recomendado)
+
 ```bash
-/opsx:ff my-feature    # 一條龍：建目錄 + brainstorm + proposal + design + specs + tasks + plan
+/opsx:ff my-feature    # tudo em um: cria diretório + brainstorm + proposal + design + specs + tasks + plan
 /opsx:apply            # worktree + subagent-driven-development
-/opsx:archive          # 封存
+/opsx:archive          # arquivar
 ```
 
-### 逐步流程
+### Fluxo passo a passo
+
 ```bash
 /opsx:new my-feature --schema sdd-plus-superpowers
-/opsx:continue         # → brainstorm（互動式對話）
+/opsx:continue         # → brainstorm (conversa interativa)
 /opsx:continue         # → proposal
 /opsx:continue         # → design
 /opsx:continue         # → specs
@@ -90,36 +101,40 @@ Superpowers 技能有預設的輸出路徑（如 brainstorming 寫到 `docs/supe
 /opsx:archive
 ```
 
-### 切回 spec-driven
+### Voltar para spec-driven
+
 ```bash
-# 單一 change 使用不同 schema
+# Usar um schema diferente em um único change
 /opsx:new my-simple-fix --schema spec-driven
 
-# 或修改專案預設
+# Ou alterar o padrão do projeto
 # openspec/config.yaml: schema: spec-driven
 ```
 
 ---
 
-## 設計決策紀錄
+## Registro de decisões de design
 
-### 為什麼 brainstorm 是 artifact 而非 hook
+### Por que brainstorm é um artefato e não um hook
 
-brainstorming 是互動式多輪對話，需要使用者參與。將它做為第一個 artifact 而非 schema-level hook，有兩個好處：
-1. **可跳過** — 如果使用者已經知道要做什麼，可以直接建立 brainstorm.md 而不調用技能
-2. **可追蹤** — `openspec status` 能顯示 brainstorm 是否完成，後續 artifacts 有明確的依賴關係
+O brainstorming é uma conversa interativa de múltiplas rodadas que requer participação do usuário. Tratá-lo como o primeiro artefato, em vez de um hook no nível do schema, traz dois benefícios:
 
-### 為什麼 plan 獨立於 tasks
+- **Pode ser pulado** — se o usuário já sabe o que quer fazer, pode criar o `brainstorm.md` diretamente sem invocar a habilidade
+- **Rastreável** — `openspec status` consegue exibir se o brainstorm foi concluído, e os artefatos seguintes têm dependências claras
 
-`tasks.md` 是粗粒度的 checkbox（「新增 PdfServiceTest」），`plan.md` 是微型步驟（「建立測試骨架 → 寫 downloadPdf 測試 → 執行 → commit」）。兩者的粒度和用途不同：
-- `tasks.md` → 追蹤整體進度（apply phase 的 `tracks` 欄位解析 checkbox）
-- `plan.md` → 指導 subagent 逐步實作（executor 的輸入）
+### Por que plan é independente de tasks
 
-apply phase 要求 `plan` 而非 `tasks`，因為 executor 需要微型步驟才能有效工作。但 `tracks: tasks.md` 確保進度仍由粗粒度 checkbox 追蹤。
+O `tasks.md` é composto por checkboxes de granularidade grossa ("adicionar PdfServiceTest"), enquanto o `plan.md` contém passos micro ("criar esqueleto do teste → escrever teste downloadPdf → executar → commit"). Granularidade e propósito são diferentes:
 
-### 降級策略
+- **tasks.md** → rastreia o progresso geral (o campo `tracks` da fase apply analisa os checkboxes)
+- **plan.md** → guia o subagente na implementação passo a passo (entrada do executor)
 
-如果 Superpowers 技能不可用（未安裝、版本不相容等），每個 instruction 都包含降級路徑：
-- brainstorm → 手動撰寫 brainstorm.md
-- plan → 手動撰寫 plan.md
-- apply → 標準 task-by-task 手動實作
+A fase apply requer `plan` em vez de `tasks`, pois o executor precisa de passos micro para trabalhar com eficiência. Porém, `tracks: tasks.md` garante que o progresso ainda seja rastreado pelos checkboxes de granularidade grossa.
+
+### Estratégia de fallback
+
+Se as habilidades do Superpowers não estiverem disponíveis (não instaladas, versão incompatível, etc.), cada instrução inclui um caminho de fallback:
+
+- **brainstorm** → escrever `brainstorm.md` manualmente
+- **plan** → escrever `plan.md` manualmente
+- **apply** → implementação manual task-by-task padrão
