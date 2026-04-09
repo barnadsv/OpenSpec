@@ -74,49 +74,49 @@ Isso é feito por injeção de contexto (anexando instruções ao invocar a habi
 ### Fluxo rápido (recomendado)
 
 ```bash
-/opsx:ff my-feature    # tudo em um: cria diretório + intent + brainstorm + proposal + design + specs + tasks + plan
-/opsx:apply            # worktree + subagent-driven-development
-/opsx:archive          # arquivar
+/opsx/ff my-feature    # tudo em um: cria diretório + intent + brainstorm + proposal + design + specs + tasks + plan
+/opsx/apply            # worktree + subagent-driven-development
+/opsx/archive          # arquivar
 ```
 
 ### Fluxo com fonte externa (PRD, ticket, etc.)
 
 ```bash
-/opsx:new my-feature --schema sdd-plus-superpowers
-/opsx:continue         # → intent (cole ou referencie o PRD/ticket como fonte)
+/opsx/new my-feature --schema sdd-plus-superpowers
+/opsx/continue         # → intent (cole ou referencie o PRD/ticket como fonte)
 # Se intent tem questões em aberto:
-/opsx:continue         # → brainstorm (resolve as questões)
+/opsx/continue         # → brainstorm (resolve as questões)
 # Se intent não tem questões em aberto:
 # brainstorm é pulado automaticamente
-/opsx:continue         # → proposal
-/opsx:continue         # → design
-/opsx:continue         # → specs
-/opsx:continue         # → tasks
-/opsx:continue         # → plan
-/opsx:apply
-/opsx:archive
+/opsx/continue         # → proposal
+/opsx/continue         # → design
+/opsx/continue         # → specs
+/opsx/continue         # → tasks
+/opsx/continue         # → plan
+/opsx/apply
+/opsx/archive
 ```
 
 ### Fluxo passo a passo (sem fonte externa)
 
 ```bash
-/opsx:new my-feature --schema sdd-plus-superpowers
+/opsx/new my-feature --schema sdd-plus-superpowers
 # intent é opcional — pule se a ideia ainda é vaga
-/opsx:continue         # → brainstorm (conversa interativa)
-/opsx:continue         # → proposal
-/opsx:continue         # → design
-/opsx:continue         # → specs
-/opsx:continue         # → tasks
-/opsx:continue         # → plan
-/opsx:apply
-/opsx:archive
+/opsx/continue         # → brainstorm (conversa interativa)
+/opsx/continue         # → proposal
+/opsx/continue         # → design
+/opsx/continue         # → specs
+/opsx/continue         # → tasks
+/opsx/continue         # → plan
+/opsx/apply
+/opsx/archive
 ```
 
 ### Voltar para spec-driven
 
 ```bash
 # Usar um schema diferente em um único change
-/opsx:new my-simple-fix --schema spec-driven
+/opsx/new my-simple-fix --schema spec-driven
 
 # Ou alterar o padrão do projeto
 # openspec/config.yaml: schema: spec-driven
@@ -269,6 +269,6 @@ schema: sdd-plus-superpowers
 Se preferir usar por change sem alterar o padrão global:
  
 ```bash
-/opsx:new my-feature --schema sdd-plus-superpowers
+/opsx/new my-feature --schema sdd-plus-superpowers
 ```
  
