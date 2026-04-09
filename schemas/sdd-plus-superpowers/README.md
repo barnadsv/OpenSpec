@@ -180,7 +180,7 @@ mkdir -p openspec/schemas/sdd-plus-superpowers/templates
  
 ```bash
 # Clone apenas o commit mais recente
-git clone --depth 1 https://git.senado.leg.br/policia/OpenSpec.git /tmp/openspec-schemas
+git clone --depth 1 https://github.com/barnadsv/OpenSpec.git /tmp/openspec-schemas
  
 # Copie o schema para o projeto
 mkdir -p openspec/schemas/sdd-plus-superpowers
