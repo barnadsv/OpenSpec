@@ -223,6 +223,10 @@ A estrutura resultante deve ser:
 openspec/schemas/sdd-plus-superpowers/
 ├── schema.yaml
 ├── README.md
+├── commands/
+│   ├── ff.md
+│   ├── new.md
+│   └── continue.md
 └── templates/
     ├── intent.md
     ├── brainstorm.md
@@ -233,13 +237,21 @@ openspec/schemas/sdd-plus-superpowers/
     └── plan.md
 ```
  
-**3. Valide o schema:**
+**3. Copie os comandos extras do schema:**
+
+```bash
+cp openspec/schemas/sdd-plus-superpowers/commands/*.md .claude/commands/opsx/
+```
+
+Isso instala `/opsx:ff`, `/opsx:new` e `/opsx:continue`. Para atualizar após upgrade do schema, rode o mesmo comando novamente.
+
+**4. Valide o schema:**
  
 ```bash
 openspec schema validate sdd-plus-superpowers
 ```
  
-**4. Confirme que está visível:**
+**5. Confirme que está visível:**
  
 ```bash
 openspec schema which sdd-plus-superpowers
@@ -247,7 +259,7 @@ openspec schema which sdd-plus-superpowers
  
 Deve retornar `Source: project`.
  
-**5. (Opcional) Ative como schema padrão do projeto:**
+**6. (Opcional) Ative como schema padrão do projeto:**
  
 ```yaml
 # openspec/config.yaml
